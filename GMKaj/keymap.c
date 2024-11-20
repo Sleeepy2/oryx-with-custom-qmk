@@ -136,11 +136,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         rgblight_sethsv(41,255,255);
       }
       return false;
-    case QMKSEL:
-      if (record->event.pressed) {
-        SEND_STRING("Select * FROM ");
-      }
-     return false;
     case QMKSELW:
       if (record->event.pressed) {
         SEND_STRING("Select * FROM \nWHERE ");
