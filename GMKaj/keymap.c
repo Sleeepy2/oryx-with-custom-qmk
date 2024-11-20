@@ -137,7 +137,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
     case QMKSELW:
       if (record->event.pressed) {
-        SEND_STRING("Select * FROM \nWHERE SS_TAP(X_UP)SS_TAP(X_END)");
+        SEND_STRING("Select * FROM \nWHERE "SS_TAP(X_UP)SS_TAP(X_END));
       }
      return false;
   }
