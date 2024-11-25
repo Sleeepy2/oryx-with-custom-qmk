@@ -17,6 +17,7 @@ enum tap_dance_codes {
   DANCE_3,
   DANCE_4,
   DANCE_5,
+  DANCE_6,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
