@@ -27,9 +27,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB,         KC_A,           KC_S,           KC_D,           KC_F,           KC_G,                                                                           KC_H,           KC_J,           KC_K,           KC_L,           TD(DANCE_4),    MT(MOD_LGUI, KC_QUOTE),
     TD(DANCE_2),    MT(MOD_LCTL, KC_Z),KC_X,        KC_C,           KC_V,           KC_B,           TD(DANCE_3),                                    OSL(3),         KC_N,           KC_M,           KC_COMMA,       KC_DOT,         MT(MOD_RCTL, KC_SLASH),TD(DANCE_5),
     LT(1,KC_GRAVE), KC_QUOTE,       CW_TOGG,        KC_LEFT,        KC_RIGHT,                                                                                                       KC_UP,          KC_DOWN,        KC_LBRC,        KC_RBRC,        TO(2),
-                                                                                                    KC_LEFT_ALT,    KC_LEFT_GUI,    KC_RIGHT_ALT,   KC_RIGHT_CTRL,
+                                                                                                    KC_LEFT_CTRL,   KC_LEFT_ALT,    KC_RIGHT_ALT,   KC_RIGHT_CTRL,
                                                                                                                     KC_HOME,        LCTL(KC_A),
-                                                                                    KC_SPACE,       KC_BSPC,        KC_END,         RGUI(KC_E),     KC_TAB,         KC_ENTER
+                                                                                    KC_SPACE,       KC_BSPC,        KC_END,         RGUI(KC_E),     KC_LEFT_GUI,         KC_ENTER
   ),
   [1] = LAYOUT_ergodox_pretty(
     KC_ESCAPE,      KC_F1,          KC_F2,          KC_F3,          KC_F4,          KC_F5,          KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,         KC_F11,
@@ -268,7 +268,7 @@ void dance_1_finished(tap_dance_state_t *state, void *user_data) {
     dance_state[1].step = dance_step(state);
     switch (dance_state[1].step) {
         case SINGLE_TAP: register_code16(LCTL(KC_C)); break;
-        case SINGLE_HOLD: register_code16(RGUI(KC_V)); break;
+        case SINGLE_HOLD: register_code16(LCTL(KC_X)); break;
         case DOUBLE_TAP: register_code16(LCTL(KC_C)); register_code16(LCTL(KC_C)); break;
         case DOUBLE_SINGLE_TAP: tap_code16(LCTL(KC_C)); register_code16(LCTL(KC_C));
     }
@@ -278,7 +278,7 @@ void dance_1_reset(tap_dance_state_t *state, void *user_data) {
     wait_ms(10);
     switch (dance_state[1].step) {
         case SINGLE_TAP: unregister_code16(LCTL(KC_C)); break;
-        case SINGLE_HOLD: unregister_code16(RGUI(KC_V)); break;
+        case SINGLE_HOLD: unregister_code16(LCTL(KC_X)); break;
         case DOUBLE_TAP: unregister_code16(LCTL(KC_C)); break;
         case DOUBLE_SINGLE_TAP: unregister_code16(LCTL(KC_C)); break;
     }
