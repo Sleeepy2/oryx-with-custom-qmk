@@ -140,11 +140,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         SEND_STRING("Select * FROM \nWHERE "SS_TAP(X_UP)SS_TAP(X_END));
       }
      return false;
-     case QMKSEL:
+    case QMKSEL:
      if (record->event.pressed) {
        SEND_STRING("Select * FROM ");
      }
-    return false;
+     return false;
   }
   return true;
 }
