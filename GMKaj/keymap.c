@@ -6,7 +6,7 @@ enum custom_keycodes {
   HSV_74_255_255,
   HSV_131_255_255,
   HSV_41_255_255,
-  QMKSELW,
+  QMKSELW = SAFE_RANGE,
   QMKSEL,
 };
 
