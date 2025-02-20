@@ -7,6 +7,7 @@ enum custom_keycodes {
   HSV_131_255_255,
   HSV_41_255_255,
   QMKSELW = SAFE_RANGE,
+  QMKSEL = SAFE_RANGE,
 };
 
 
@@ -25,7 +26,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     TD(DANCE_0),    KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           TD(DANCE_1),                                    LALT(KC_SPACE), KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_MINUS,
     KC_DELETE,      KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,           TG(1),                                          OSL(1),         KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_BSLS,
     KC_TAB,         KC_A,           KC_S,           KC_D,           KC_F,           KC_G,                                                                           KC_H,           KC_J,           KC_K,           KC_L,           TD(DANCE_4),    MT(MOD_LGUI, KC_QUOTE),
-    TD(DANCE_2),    MT(MOD_LCTL, KC_Z),KC_X,        KC_C,           KC_V,           KC_B,           TD(DANCE_3),                                    OSL(3),         KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       TD(DANCE_5),
+    TD(DANCE_2),    KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,           TD(DANCE_3),                                    OSL(3),         KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       TD(DANCE_5),
     LT(1,KC_GRAVE), KC_QUOTE,       CW_TOGG,        KC_LEFT,        KC_RIGHT,                                                                                                       KC_UP,          KC_DOWN,        KC_LBRC,        KC_RBRC,        OSL(2),
                                                                                                     KC_LEFT_CTRL,   KC_LEFT_ALT,    KC_RIGHT_ALT,   KC_RIGHT_CTRL,
                                                                                                                     KC_HOME,        LCTL(KC_A),
@@ -53,7 +54,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
   [3] = LAYOUT_ergodox_pretty(
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-    KC_TRANSPARENT, LCTL(LSFT(KC_ESCAPE)),KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, QMKSELW, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+    KC_TRANSPARENT, LCTL(LSFT(KC_ESCAPE)),KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, LCTL(LSFT(KC_F)), KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, QMKSEL, QMKSELW, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
     KC_TRANSPARENT, LGUI(LCTL(KC_LEFT)),LGUI(LCTL(KC_RIGHT)),KC_TRANSPARENT, LCTL(KC_F),    LGUI(LSFT(KC_S)),                                                                KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, LALT(LSFT(KC_F)),KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                                                                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
@@ -139,6 +140,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         SEND_STRING("Select * FROM \nWHERE "SS_TAP(X_UP)SS_TAP(X_END));
       }
      return false;
+     case QMKSEL:
+     if (record->event.pressed) {
+       SEND_STRING("Select * FROM ");
+     }
+    return false;
   }
   return true;
 }
