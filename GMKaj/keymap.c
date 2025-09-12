@@ -345,8 +345,6 @@ void dance_3_finished(tap_dance_state_t *state, void *user_data) {
     switch (dance_state[3].step) {
         case SINGLE_TAP: register_code16(LSG(KC_E)); break;
         case SINGLE_HOLD: register_code16(LSG(KC_V)); break;
-        case DOUBLE_TAP: register_code16(LCTL(KC_V)); break;
-        case DOUBLE_SINGLE_TAP: tap_code16(LCTL(KC_V)); register_code16(LCTL(KC_V)); break;
     }
 }
 
@@ -355,8 +353,6 @@ void dance_3_reset(tap_dance_state_t *state, void *user_data) {
     switch (dance_state[3].step) {
         case SINGLE_TAP: unregister_code16(LSG(KC_E)); break;
         case SINGLE_HOLD: unregister_code16(LSG(KC_V)); break;
-        case DOUBLE_TAP: unregister_code16(LGUI(KC_V)); break;
-        case DOUBLE_SINGLE_TAP: unregister_code16(LCAG(KC_V)); break;
     }
     dance_state[3].step = 0;
 }
