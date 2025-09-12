@@ -346,7 +346,7 @@ void dance_3_finished(tap_dance_state_t *state, void *user_data) {
         case SINGLE_TAP: register_code16(LSG(KC_E)); break;
         case SINGLE_HOLD: register_code16(LSG(KC_V)); break;
         case DOUBLE_TAP: register_code16(LCTL(KC_V)); break;
-        case DOUBLE_SINGLE_TAP: tap_code16(LCTL(KC_V)); register_code16(LCTL(KC_V));
+        case DOUBLE_SINGLE_TAP: tap_code16(LCTL(KC_V)); register_code16(LCTL(KC_V)); break;
     }
 }
 
