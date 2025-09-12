@@ -329,19 +329,19 @@ void on_dance_3(tap_dance_state_t *state, void *user_data);
 void dance_3_finished(tap_dance_state_t *state, void *user_data);
 void dance_3_reset(tap_dance_state_t *state, void *user_data);
 
-// ... other code ...
-
-// --- implementations (only one set of these) ---
 void on_dance_3(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 3) { tap_code16(LSG(KC_E)); tap_code16(LSG(KC_E)); tap_code16(LSG(KC_E)); }
-    else if (state->count > 3) { tap_code16(LSG(KC_V)); }
+    if (state->count == 3) {
+        tap_code16(G(S(KC_E))); tap_code16(G(S(KC_E))); tap_code16(G(S(KC_E)));
+    } else if (state->count > 3) {
+        tap_code16(G(S(KC_V)));
+    }
 }
 
 void dance_3_finished(tap_dance_state_t *state, void *user_data) {
     dance_state[3].step = dance_step(state);
     switch (dance_state[3].step) {
-        case SINGLE_TAP:  tap_code16(LSG(KC_E)); break;
-        case SINGLE_HOLD: tap_code16(LSG(KC_V)); break;
+        case SINGLE_TAP:  tap_code16(G(S(KC_E))); break;
+        case SINGLE_HOLD: tap_code16(G(S(KC_V))); break;
         default: break;
     }
 }
@@ -349,6 +349,7 @@ void dance_3_finished(tap_dance_state_t *state, void *user_data) {
 void dance_3_reset(tap_dance_state_t *state, void *user_data) {
     dance_state[3].step = 0;
 }
+
 
 void on_dance_4(tap_dance_state_t *state, void *user_data);
 void dance_4_finished(tap_dance_state_t *state, void *user_data);
