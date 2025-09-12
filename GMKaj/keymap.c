@@ -336,7 +336,7 @@ void on_dance_3(tap_dance_state_t *state, void *user_data) {
         tap_code16(LCAG(KC_V));
     }
     if(state->count > 3) {
-        tap_code16(LCAGT(KC_V));
+        tap_code16(LCAG(KC_V));
     }
 }
 
@@ -356,7 +356,7 @@ void dance_3_reset(tap_dance_state_t *state, void *user_data) {
         case SINGLE_TAP: unregister_code16(LCAG(KC_V)); break;
         case SINGLE_HOLD: unregister_code16(LSG(KC_V)); break;
         case DOUBLE_TAP: unregister_code16(LGUI(KC_V)); break;
-        case DOUBLE_SINGLE_TAP: unregister_code16(LCAGT(KC_V)); break;
+        case DOUBLE_SINGLE_TAP: unregister_code16(LCAG(KC_V)); break;
     }
     dance_state[3].step = 0;
 }
