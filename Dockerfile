@@ -1,7 +1,8 @@
-FROM debian:latest
+# Dockerfile
 
-RUN apt update && apt install -y git python3 python3-pip sudo gcc-arm-none-eabi binutils-arm-none-eabi make build-essential ca-certificates
+FROM ubuntu:22.04
 
-RUN python3 -m pip install qmk appdirs --break-system-packages
+# Install required packages
+RUN apt-get update && apt-get install -y --no-install-recommends dfu-util && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /root
+# Other commands...
