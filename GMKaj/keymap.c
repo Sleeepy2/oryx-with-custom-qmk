@@ -126,6 +126,9 @@ bool rgb_matrix_indicators_user(void) {
   return true;
 }
 
+// Tap dance is disabled, but QMK introspection expects this symbol when the feature is enabled.
+tap_dance_action_t tap_dance_actions[] = { };
+
 
 
 static uint16_t df_wse_wsv_timer = 0;
