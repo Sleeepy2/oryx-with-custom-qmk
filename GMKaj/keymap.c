@@ -164,29 +164,44 @@ uint8_t dance_step(tap_dance_state_t *state) {
 }
 
 
+void on_dance_0(tap_dance_state_t *state, void *user_data);
 void dance_0_finished(tap_dance_state_t *state, void *user_data);
 void dance_0_reset(tap_dance_state_t *state, void *user_data);
+
+void on_dance_0(tap_dance_state_t *state, void *user_data) {
+    if(state->count == 3) {
+        tap_code16(LCTL(KC_V));
+        tap_code16(LCTL(KC_V));
+        tap_code16(LCTL(KC_V));
+    }
+    if(state->count > 3) {
+        tap_code16(LCTL(KC_V));
+    }
+}
 
 void dance_0_finished(tap_dance_state_t *state, void *user_data) {
     dance_state[0].step = dance_step(state);
     switch (dance_state[0].step) {
-        case SINGLE_TAP: tap_code16(RGUI(RSFT(KC_E))); break;
+        case SINGLE_TAP: register_code16(LCTL(KC_V)); break;
         case SINGLE_HOLD: register_code16(LGUI(LSFT(KC_V))); break;
-        case DOUBLE_TAP: tap_code16(LCTL(KC_V)); break;
-        case DOUBLE_SINGLE_TAP: tap_code16(RGUI(RSFT(KC_E))); tap_code16(RGUI(RSFT(KC_E)));
+        case DOUBLE_TAP: register_code16(RGUI(RSFT(KC_E))); break;
+        case DOUBLE_SINGLE_TAP: tap_code16(LCTL(KC_V)); register_code16(LCTL(KC_V));
     }
 }
 
 void dance_0_reset(tap_dance_state_t *state, void *user_data) {
     wait_ms(10);
     switch (dance_state[0].step) {
+        case SINGLE_TAP: unregister_code16(LCTL(KC_V)); break;
         case SINGLE_HOLD: unregister_code16(LGUI(LSFT(KC_V))); break;
+        case DOUBLE_TAP: unregister_code16(RGUI(RSFT(KC_E))); break;
+        case DOUBLE_SINGLE_TAP: unregister_code16(LCTL(KC_V)); break;
     }
     dance_state[0].step = 0;
 }
 
 tap_dance_action_t tap_dance_actions[] = {
-        [DANCE_0] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_0_finished, dance_0_reset),
+        [DANCE_0] = ACTION_TAP_DANCE_FN_ADVANCED(on_dance_0, dance_0_finished, dance_0_reset),
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -209,12 +224,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     break;
     case ST_MACRO_0:
     if (record->event.pressed) {
-      SEND_STRING(SS_LSFT(SS_TAP(X_S))SS_DELAY(10)  SS_LSFT(SS_TAP(X_E))SS_DELAY(10)  SS_LSFT(SS_TAP(X_L))SS_DELAY(10)  SS_LSFT(SS_TAP(X_E))SS_DELAY(10)  SS_LSFT(SS_TAP(X_C))SS_DELAY(10)  SS_LSFT(SS_TAP(X_T))SS_DELAY(10)  SS_TAP(X_SPACE)SS_DELAY(10)  SS_TAP(X_KP_ASTERISK)SS_DELAY(10)  SS_TAP(X_SPACE)SS_DELAY(10)  SS_LSFT(SS_TAP(X_F))SS_DELAY(10)  SS_LSFT(SS_TAP(X_R))SS_DELAY(10)  SS_LSFT(SS_TAP(X_O))SS_DELAY(10)  SS_LSFT(SS_TAP(X_M))SS_DELAY(10)  SS_TAP(X_SPACE));
+      SEND_STRING("Select * FROM ");
     }
     break;
     case ST_MACRO_1:
     if (record->event.pressed) {
-      SEND_STRING(SS_LSFT(SS_TAP(X_S))SS_DELAY(10)  SS_LSFT(SS_TAP(X_E))SS_DELAY(10)  SS_LSFT(SS_TAP(X_L))SS_DELAY(10)  SS_LSFT(SS_TAP(X_E))SS_DELAY(10)  SS_LSFT(SS_TAP(X_C))SS_DELAY(10)  SS_LSFT(SS_TAP(X_T))SS_DELAY(10)  SS_TAP(X_SPACE)SS_DELAY(10)  SS_TAP(X_KP_ASTERISK)SS_DELAY(10)  SS_TAP(X_SPACE)SS_DELAY(10)  SS_LSFT(SS_TAP(X_F))SS_DELAY(10)  SS_LSFT(SS_TAP(X_R))SS_DELAY(10)  SS_LSFT(SS_TAP(X_O))SS_DELAY(10)  SS_LSFT(SS_TAP(X_M))SS_DELAY(10)  SS_TAP(X_ENTER)SS_DELAY(10)  SS_LSFT(SS_TAP(X_W))SS_DELAY(10)  SS_LSFT(SS_TAP(X_H))SS_DELAY(10)  SS_LSFT(SS_TAP(X_E))SS_DELAY(10)  SS_LSFT(SS_TAP(X_R))SS_DELAY(10)  SS_LSFT(SS_TAP(X_E))SS_DELAY(10)  SS_TAP(X_UP)SS_DELAY(10)  SS_TAP(X_END));
+      SEND_STRING("Select * FROM \nWHERE "SS_TAP(X_UP)SS_TAP(X_END));
     }
     break;
 
@@ -309,19 +324,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }  
       return false;
     case DUAL_FUNC_6:
+      if (record->event.pressed) {
+        return false; // wait until release to decide tap vs hold
+      }
       if (record->tap.count > 0) {
-        if (record->event.pressed) {
-          register_code16(LCTL(KC_F));
-        } else {
-          unregister_code16(LCTL(KC_F));
-        }
+        tap_code16(LCTL(KC_F));
       } else {
-        if (record->event.pressed) {
-          register_code16(LCTL(LSFT(KC_F)));
-        } else {
-          unregister_code16(LCTL(LSFT(KC_F)));
-        }  
-      }  
+        tap_code16(LCTL(LSFT(KC_F)));
+      }
       return false;
     case RGB_SLD:
       if (record->event.pressed) {
