@@ -36,7 +36,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: oryx
-          fetch-depth: 0
+
+      - name: Download the full history for the merge to work correctly
+        run: git pull --unshallow
 
       - name: Download layout source
         id: download-layout-source
@@ -71,30 +73,21 @@ jobs:
 
       - name: Merge Oryx with custom QMK
         run: |
-          git fetch --depth=1 origin main
+          git fetch origin main
           git checkout -B main origin/main
-          git merge -Xignore-all-space --allow-unrelated-histories oryx
+          git merge -Xignore-all-space oryx
           git push
 
       - name: Update QMK firmware submodule to latest version (${{ steps.download-layout-source.outputs.firmware_version }})
         run: |
-          git submodule update --init --depth=1
+          git submodule update --init --remote --depth=1 --no-single-branch
           cd qmk_firmware
-          git fetch --depth=1 origin firmware${{ steps.download-layout-source.outputs.firmware_version }}
-          git checkout -B firmware${{ steps.download-layout-source.outputs.firmware_version }} FETCH_HEAD
-          git submodule update --init --recursive --depth=1
+          git checkout -B firmware${{ steps.download-layout-source.outputs.firmware_version }} origin/firmware${{ steps.download-layout-source.outputs.firmware_version }}
+          git submodule update --init --recursive
           cd ..
           git add qmk_firmware
           git commit -m "✨(qmk): Update firmware" || echo "No QMK change"
           git push
-
-      - name: Cache QMK downloads
-        uses: actions/cache@v4
-        with:
-          path: .qmk_cache
-          key: qmk-${{ runner.os }}-${{ steps.download-layout-source.outputs.firmware_version }}
-          restore-keys: |
-            qmk-${{ runner.os }}-
 
       - name: Build qmk docker image
         run: docker build -t qmk .
@@ -116,7 +109,7 @@ jobs:
           mkdir -p ${keyboard_directory}/${{ github.event.inputs.layout_geometry }}/keymaps && cp -r ${{ github.event.inputs.layout_id }} "$_"
           
           # Build the layout
-          docker run -v ./qmk_firmware:/root -v ./.qmk_cache:/root/.cache/qmk --rm qmk /bin/sh -c "
+          docker run -v ./qmk_firmware:/root --rm qmk /bin/sh -c "
             qmk setup zsa/qmk_firmware -b firmware${{ steps.download-layout-source.outputs.firmware_version }} -y
             make ${make_prefix}${{ github.event.inputs.layout_geometry }}:${{ github.event.inputs.layout_id }}
           "
