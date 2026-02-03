@@ -131,22 +131,8 @@ tap_dance_action_t tap_dance_actions[] = { };
 
 
 
-static uint16_t df_wse_wsv_timer = 0;
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-  case DF_WSE_WSV:
-      if (record->event.pressed) {
-        df_wse_wsv_timer = timer_read();
-      } else {
-        if (timer_elapsed(df_wse_wsv_timer) < TAPPING_TERM) {
-          tap_code16(LGUI(LSFT(KC_E)));
-        } else {
-          tap_code16(LGUI(LSFT(KC_V)));
-        }
-      }
-      return false;
-
   case QK_MODS ... QK_MODS_MAX: 
     // Mouse keys with modifiers work inconsistently across operating systems, this makes sure that modifiers are always
     // applied to the mouse key that was pressed.
@@ -264,6 +250,21 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }  
       }  
       return false;
+  case DF_WSE_WSV:
+      if (record->tap.count > 0) {
+        if (record->event.pressed) {
+          register_code16(LGUI(LSFT(KC_E)));
+        } else {
+          unregister_code16(LGUI(LSFT(KC_E)));
+        }
+      } else {
+        if (record->event.pressed) {
+          register_code16(LGUI(LSFT(KC_V)));
+        } else {
+          unregister_code16(LGUI(LSFT(KC_V)));
+        }  
+      }  
+      return false; 
     case DUAL_FUNC_6:
       if (record->event.pressed) {
         return false; // wait until release to decide tap vs hold
