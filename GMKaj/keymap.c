@@ -19,20 +19,20 @@ enum tap_dance_codes {
   DANCE_0,
 };
 
-#define DUAL_FUNC_0 LT(8, KC_Y)
-#define DUAL_FUNC_1 LT(1, KC_R)
-#define DUAL_FUNC_2 LT(14, KC_F18)
-#define DUAL_FUNC_3 LT(2, KC_F13)
-#define DUAL_FUNC_4 LT(4, KC_F1)
-#define DUAL_FUNC_5 LT(3, KC_4)
-#define DUAL_FUNC_6 LT(2, KC_E)
+#define DUAL_FUNC_0 LT(3, KC_F14)
+#define DUAL_FUNC_1 LT(7, KC_J)
+#define DUAL_FUNC_2 LT(15, KC_X)
+#define DUAL_FUNC_3 LT(11, KC_H)
+#define DUAL_FUNC_4 LT(10, KC_R)
+#define DUAL_FUNC_5 LT(2, KC_S)
+#define DUAL_FUNC_6 LT(10, KC_Y)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_ergodox_pretty(
     DUAL_FUNC_0,    KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           DUAL_FUNC_1,                                    LALT(KC_SPACE), KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_MINUS,
     KC_DELETE,      KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,           TG(1),                                          OSL(1),         KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_BSLS,
     KC_TAB,         KC_A,           KC_S,           KC_D,           KC_F,           KC_G,                                                                           KC_H,           KC_J,           KC_K,           KC_L,           DUAL_FUNC_3,    MT(MOD_LGUI, KC_QUOTE),
-    DUAL_FUNC_2,    KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,           TD(DANCE_0),                                    OSL(3),         KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       DUAL_FUNC_4,
+    DUAL_FUNC_2,    KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,           TD(DANCE_0),                                    KC_TRANSPARENT, KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       DUAL_FUNC_4,
     KC_GRAVE,       KC_QUOTE,       CW_TOGG,        KC_LEFT,        KC_RIGHT,                                                                                                       KC_UP,          KC_DOWN,        KC_LBRC,        KC_RBRC,        TO(2),
                                                                                                     KC_LEFT_CTRL,   KC_RIGHT_ALT,   KC_RIGHT_ALT,   KC_RIGHT_CTRL,
                                                                                                                     KC_HOME,        LCTL(KC_A),
@@ -139,12 +139,12 @@ typedef struct {
 } tap;
 
 enum {
-    SINGLE_TAP = 1,
-    SINGLE_HOLD,
-    DOUBLE_TAP,
-    DOUBLE_HOLD,
-    DOUBLE_SINGLE_TAP,
-    MORE_TAPS
+    SINGLE_TAP = 1,      
+    SINGLE_HOLD,         
+    DOUBLE_TAP,          
+    DOUBLE_HOLD,         
+    DOUBLE_SINGLE_TAP,   
+    MORE_TAPS            
 };
 
 static tap dance_state[1];
@@ -206,11 +206,11 @@ tap_dance_action_t tap_dance_actions[] = {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-  case QK_MODS ... QK_MODS_MAX: 
-    // Mouse keys with modifiers work inconsistently across operating systems, this makes sure that modifiers are always
-    // applied to the mouse key that was pressed.
-    if (IS_MOUSE_KEYCODE(QK_MODS_GET_BASIC_KEYCODE(keycode))) {
-    if (record->event.pressed) {
+  case QK_MODS ... QK_MODS_MAX:
+    // Mouse and consumer keys (volume, media) with modifiers work inconsistently across operating systems,
+    // this makes sure that modifiers are always applied to the key that was pressed.
+    if (IS_MOUSE_KEYCODE(QK_MODS_GET_BASIC_KEYCODE(keycode)) || IS_CONSUMER_KEYCODE(QK_MODS_GET_BASIC_KEYCODE(keycode))) {
+      if (record->event.pressed) {
         add_mods(QK_MODS_GET_MODS(keycode));
         send_keyboard_report();
         wait_ms(2);
