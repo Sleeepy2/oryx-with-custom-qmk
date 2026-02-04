@@ -129,6 +129,10 @@ bool rgb_matrix_indicators_user(void) {
 // Tap dance is disabled, but QMK introspection expects this symbol when the feature is enabled.
 tap_dance_action_t tap_dance_actions[] = { };
 
+static uint16_t df_wse_wsv_timer = 0;
+static uint8_t df_wse_wsv_taps = 0;
+static bool df_wse_wsv_waiting = false;
+
 
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -251,20 +255,27 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }  
       return false;
   case DF_WSE_WSV:
-      if (record->tap.count > 0) {
-        if (record->event.pressed) {
-          register_code16(LGUI(LSFT(KC_E)));
-        } else {
-          unregister_code16(LGUI(LSFT(KC_E)));
+      if (record->event.pressed) {
+        if (df_wse_wsv_taps == 0) {
+          df_wse_wsv_timer = timer_read();
         }
       } else {
-        if (record->event.pressed) {
-          register_code16(LGUI(LSFT(KC_V)));
-        } else {
-          unregister_code16(LGUI(LSFT(KC_V)));
-        }  
-      }  
-      return false; 
+        if (timer_elapsed(df_wse_wsv_timer) > TAPPING_TERM) {
+          tap_code16(LGUI(LSFT(KC_E)));
+          df_wse_wsv_taps = 0;
+          df_wse_wsv_waiting = false;
+          return false;
+        }
+        df_wse_wsv_taps++;
+        df_wse_wsv_timer = timer_read();
+        df_wse_wsv_waiting = true;
+        if (df_wse_wsv_taps >= 2) {
+          tap_code16(LCTL(KC_V));
+          df_wse_wsv_taps = 0;
+          df_wse_wsv_waiting = false;
+        }
+      }
+      return false;
     case DUAL_FUNC_6:
       if (record->event.pressed) {
         return false; // wait until release to decide tap vs hold
@@ -340,4 +351,12 @@ uint8_t layer_state_set_user(uint8_t state) {
   }
   return state;
 };
+
+void matrix_scan_user(void) {
+  if (df_wse_wsv_waiting && timer_elapsed(df_wse_wsv_timer) > TAPPING_TERM) {
+    tap_code16(LGUI(LSFT(KC_E)));
+    df_wse_wsv_taps = 0;
+    df_wse_wsv_waiting = false;
+  }
+}
 
