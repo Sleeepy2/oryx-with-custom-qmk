@@ -15,22 +15,25 @@ enum custom_keycodes {
   DF_WSE_WSV,
 };
 
+enum tap_dance_codes {
+  DANCE_0,
+};
 
 
-#define DUAL_FUNC_0 LT(8, KC_Y)
-#define DUAL_FUNC_1 LT(1, KC_R)
-#define DUAL_FUNC_2 LT(14, KC_F18)
-#define DUAL_FUNC_3 LT(2, KC_F13)
-#define DUAL_FUNC_4 LT(4, KC_F1)
-#define DUAL_FUNC_5 LT(3, KC_4)
-#define DUAL_FUNC_6 LT(2, KC_E)
+#define DUAL_FUNC_0 LT(12, KC_U)
+#define DUAL_FUNC_1 LT(8, KC_8)
+#define DUAL_FUNC_2 LT(3, KC_7)
+#define DUAL_FUNC_3 LT(11, KC_V)
+#define DUAL_FUNC_4 LT(4, KC_2)
+#define DUAL_FUNC_5 LT(15, KC_F3)
+#define DUAL_FUNC_6 LT(8, KC_C)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_ergodox_pretty(
     DUAL_FUNC_0,    KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           DUAL_FUNC_1,                                    LALT(KC_SPACE), KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_MINUS,
     KC_DELETE,      KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,           TG(1),                                          OSL(1),         KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_BSLS,
     KC_TAB,         KC_A,           KC_S,           KC_D,           KC_F,           KC_G,                                                                           KC_H,           KC_J,           KC_K,           KC_L,           DUAL_FUNC_3,    MT(MOD_LGUI, KC_QUOTE),
-    DUAL_FUNC_2,    KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,           DF_WSE_WSV,                                    OSL(3),         KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       DUAL_FUNC_4,
+    DUAL_FUNC_2,    KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,           TD(DANCE_0),                                    KC_TRANSPARENT, KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       DUAL_FUNC_4,
     KC_GRAVE,       KC_QUOTE,       CW_TOGG,        KC_LEFT,        KC_RIGHT,                                                                                                       KC_UP,          KC_DOWN,        KC_LBRC,        KC_RBRC,        TO(2),
                                                                                                     KC_LEFT_CTRL,   KC_RIGHT_ALT,   KC_RIGHT_ALT,   KC_RIGHT_CTRL,
                                                                                                                     KC_HOME,        LCTL(KC_A),
@@ -126,22 +129,86 @@ bool rgb_matrix_indicators_user(void) {
   return true;
 }
 
-// Tap dance is disabled, but QMK introspection expects this symbol when the feature is enabled.
-tap_dance_action_t tap_dance_actions[] = { };
-
-static uint16_t df_wse_wsv_timer = 0;
-static uint8_t df_wse_wsv_taps = 0;
-static bool df_wse_wsv_waiting = false;
 
 
+typedef struct {
+    bool is_press_action;
+    uint8_t step;
+} tap;
+
+enum {
+    SINGLE_TAP = 1,      
+    SINGLE_HOLD,         
+    DOUBLE_TAP,          
+    DOUBLE_HOLD,         
+    DOUBLE_SINGLE_TAP,   
+    MORE_TAPS            
+};
+
+static tap dance_state[1];
+
+uint8_t dance_step(tap_dance_state_t *state);
+
+uint8_t dance_step(tap_dance_state_t *state) {
+    if (state->count == 1) {
+        if (state->interrupted || !state->pressed) return SINGLE_TAP;
+        else return SINGLE_HOLD;
+    } else if (state->count == 2) {
+        if (state->interrupted) return DOUBLE_SINGLE_TAP;
+        else if (state->pressed) return DOUBLE_HOLD;
+        else return DOUBLE_TAP;
+    }
+    return MORE_TAPS;
+}
+
+
+void on_dance_0(tap_dance_state_t *state, void *user_data);
+void dance_0_finished(tap_dance_state_t *state, void *user_data);
+void dance_0_reset(tap_dance_state_t *state, void *user_data);
+
+void on_dance_0(tap_dance_state_t *state, void *user_data) {
+    if(state->count == 3) {
+        tap_code16(LCTL(KC_V));
+        tap_code16(LCTL(KC_V));
+        tap_code16(LCTL(KC_V));
+    }
+    if(state->count > 3) {
+        tap_code16(LCTL(KC_V));
+    }
+}
+
+void dance_0_finished(tap_dance_state_t *state, void *user_data) {
+    dance_state[0].step = dance_step(state);
+    switch (dance_state[0].step) {
+        case SINGLE_TAP: register_code16(LCTL(KC_V)); break;
+        case SINGLE_HOLD: register_code16(LGUI(LSFT(KC_V))); break;
+        case DOUBLE_TAP: register_code16(RGUI(RSFT(KC_E))); break;
+        case DOUBLE_SINGLE_TAP: tap_code16(LCTL(KC_V)); register_code16(LCTL(KC_V));
+    }
+}
+
+void dance_0_reset(tap_dance_state_t *state, void *user_data) {
+    wait_ms(10);
+    switch (dance_state[0].step) {
+        case SINGLE_TAP: unregister_code16(LCTL(KC_V)); break;
+        case SINGLE_HOLD: unregister_code16(LGUI(LSFT(KC_V))); break;
+        case DOUBLE_TAP: unregister_code16(RGUI(RSFT(KC_E))); break;
+        case DOUBLE_SINGLE_TAP: unregister_code16(LCTL(KC_V)); break;
+    }
+    dance_state[0].step = 0;
+}
+
+tap_dance_action_t tap_dance_actions[] = {
+        [DANCE_0] = ACTION_TAP_DANCE_FN_ADVANCED(on_dance_0, dance_0_finished, dance_0_reset),
+};
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-  case QK_MODS ... QK_MODS_MAX: 
-    // Mouse keys with modifiers work inconsistently across operating systems, this makes sure that modifiers are always
-    // applied to the mouse key that was pressed.
-    if (IS_MOUSE_KEYCODE(QK_MODS_GET_BASIC_KEYCODE(keycode))) {
-    if (record->event.pressed) {
+  case QK_MODS ... QK_MODS_MAX:
+    // Mouse and consumer keys (volume, media) with modifiers work inconsistently across operating systems,
+    // this makes sure that modifiers are always applied to the key that was pressed.
+    if (IS_MOUSE_KEYCODE(QK_MODS_GET_BASIC_KEYCODE(keycode)) || IS_CONSUMER_KEYCODE(QK_MODS_GET_BASIC_KEYCODE(keycode))) {
+      if (record->event.pressed) {
         add_mods(QK_MODS_GET_MODS(keycode));
         send_keyboard_report();
         wait_ms(2);
