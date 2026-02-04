@@ -12,7 +12,6 @@ enum custom_keycodes {
   HSV_41_255_255,
   ST_MACRO_0,
   ST_MACRO_1,
-  DF_WSE_WSV,
 };
 
 enum tap_dance_codes {
@@ -321,28 +320,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }  
       }  
       return false;
-  case DF_WSE_WSV:
-      if (record->event.pressed) {
-        if (df_wse_wsv_taps == 0) {
-          df_wse_wsv_timer = timer_read();
-        }
-      } else {
-        if (timer_elapsed(df_wse_wsv_timer) > TAPPING_TERM) {
-          tap_code16(LGUI(LSFT(KC_E)));
-          df_wse_wsv_taps = 0;
-          df_wse_wsv_waiting = false;
-          return false;
-        }
-        df_wse_wsv_taps++;
-        df_wse_wsv_timer = timer_read();
-        df_wse_wsv_waiting = true;
-        if (df_wse_wsv_taps >= 2) {
-          tap_code16(LCTL(KC_V));
-          df_wse_wsv_taps = 0;
-          df_wse_wsv_waiting = false;
-        }
-      }
-      return false;
     case DUAL_FUNC_6:
       if (record->event.pressed) {
         return false; // wait until release to decide tap vs hold
@@ -418,12 +395,4 @@ uint8_t layer_state_set_user(uint8_t state) {
   }
   return state;
 };
-
-void matrix_scan_user(void) {
-  if (df_wse_wsv_waiting && timer_elapsed(df_wse_wsv_timer) > TAPPING_TERM) {
-    tap_code16(LGUI(LSFT(KC_E)));
-    df_wse_wsv_taps = 0;
-    df_wse_wsv_waiting = false;
-  }
-}
 
