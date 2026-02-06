@@ -213,6 +213,8 @@ void dance_0_reset(tap_dance_state_t *state, void *user_data) {
             unregister_code16(LCTL(KC_V)); 
             break;
     }
+    clear_mods();
+    send_keyboard_report();
     dance_state[0].step = 0;
 }
 
