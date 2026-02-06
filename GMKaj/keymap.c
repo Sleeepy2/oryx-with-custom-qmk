@@ -207,7 +207,7 @@ void dance_0_reset(tap_dance_state_t *state, void *user_data) {
         case DOUBLE_TAP: 
         case DOUBLE_HOLD: 
             unregister_code16(LSG(KC_E)); 
-            unregister_mods(MOD_BIT(KC_LGUI) | MOD_BIT(KC_LSHIFT));
+            unregister_mods(MOD_BIT(KC_LGUI) | MOD_BIT(KC_LSFT));
             break;
         case DOUBLE_SINGLE_TAP: 
             unregister_code16(LCTL(KC_V)); 
