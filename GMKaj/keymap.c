@@ -33,7 +33,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_DELETE,      KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,           TG(1),                                          OSL(1),         KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_BSLS,
     KC_TAB,         KC_A,           KC_S,           KC_D,           KC_F,           KC_G,                                                                           KC_H,           KC_J,           KC_K,           KC_L,           DUAL_FUNC_3,    MT(MOD_LGUI, KC_QUOTE),
     DUAL_FUNC_2,    KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,           TD(DANCE_0),                                    OSL(3),         KC_N,           KC_M,           KC_COMMA,       KC_DOT,         KC_SLASH,       DUAL_FUNC_4,
-    KC_GRAVE,       KC_QUOTE,       CW_TOGG,        KC_LEFT,        KC_RIGHT,                                                                                                       KC_UP,          KC_DOWN,        KC_LBRC,        KC_RBRC,        TO(2),
+    KC_GRAVE,       KC_QUOTE,       CW_TOGG,        KC_LEFT,        KC_RIGHT,                                                                                                       KC_UP,          KC_DOWN,        KC_LBRC,        KC_RBRC,        OSL(2),
                                                                                                     KC_LEFT_CTRL,   KC_RIGHT_ALT,   KC_RIGHT_ALT,   KC_RIGHT_CTRL,
                                                                                                                     KC_HOME,        LCTL(KC_A),
                                                                                     KC_SPACE,       KC_BSPC,        KC_END,         RGUI(KC_E),     KC_LEFT_GUI,    KC_ENTER
@@ -207,6 +207,7 @@ void dance_0_reset(tap_dance_state_t *state, void *user_data) {
         case DOUBLE_TAP: 
         case DOUBLE_HOLD: 
             unregister_code16(LSG(KC_E)); 
+            unregister_mods(MOD_BIT(KC_LGUI) | MOD_BIT(KC_LSHIFT));
             break;
         case DOUBLE_SINGLE_TAP: 
             unregister_code16(LCTL(KC_V)); 
@@ -249,19 +250,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     break;
 
     case DUAL_FUNC_0:
-      if (record->tap.count > 0) {
-        if (record->event.pressed) {
-          register_code16(KC_ESCAPE);
-        } else {
-          unregister_code16(KC_ESCAPE);
-        }
+      if (record->event.pressed) {
+          if (record->tap.count == 1) {
+              register_code16(KC_ESCAPE);
+          } else if (record->tap.count >= 2) {
+              unregister_code16(KC_ESCAPE); // Ensure Escape is cleared if this is the second tap
+              register_code16(KC_EQUAL);
+          }
       } else {
-        if (record->event.pressed) {
-          register_code16(KC_EQUAL);
-        } else {
+          // Unregister everything on release to prevent stuck keys
+          unregister_code16(KC_ESCAPE);
           unregister_code16(KC_EQUAL);
-        }  
-      }  
+      }
       return false;
     case DUAL_FUNC_1:
       if (record->tap.count > 0) {
